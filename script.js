@@ -1,3 +1,6 @@
+let fieldsFilled = false;
+let fieldsFilledWithCorrectValue = false;
+
 window.addEventListener('load', function() {
    let form = document.getElementById('launchForm').getElementsByTagName('form')[0];
    let pilotName = document.getElementById('pilotName');
@@ -11,49 +14,55 @@ window.addEventListener('load', function() {
    let cargoStatus = document.getElementById('cargoStatus');
    let faultyItems = document.getElementById('faultyItems');
    let launchStatus = document.getElementById('launchStatus');
+   
 
-   form.addEventListener('submit', function() {
-      allFieldsFilled();
-      fieldsFilledWithCorrectType();
-      updateShuttleRequirements();
-      selectPlanet();
+   form.addEventListener('submit', function() {      
+      checkAllFieldsFilled();
+      checkFieldsFilledWithCorrectType();
+      if (fieldsFilled && fieldsFilledWithCorrectValue) {
+         updateShuttleRequirements();
+         selectPlanet();
+      }
    })
 
 })
 
-function allFieldsFilled() {
+function checkAllFieldsFilled() {
    if (pilotName.value === '' || 
        copilotName.value === '' || 
        fuelLevel.value === '' || 
        cargoMass.value === '') {
       alert('Must enter a value in all fields.');
       event.preventDefault();
+   } else {
+      fieldsFilled = true;
    }
 }
 
-function fieldsFilledWithCorrectType() {
+function checkFieldsFilledWithCorrectType() {
    if (isNaN(fuelLevel.value) || isNaN(cargoMass.value)) {
       alert('Must enter valid information for all fields');
       event.preventDefault();
+   } else {
+      fieldsFilledWithCorrectValue = true;
    }
 }
 
 function updateShuttleRequirements() {
    pilotStatus.textContent = `Pilot ${pilotName.value} is ready for launch`;
    copilotStatus.textContent = `Copilot ${copilotName.value} is ready for launch`;
-   
+   faultyItems.style.visibility = 'visible';
+
    if (fuelLevel.value < 10000 || cargoMass.value > 10000) {
       shuttleNotReady();
    } else {
-      launchStatus.textContent = 'Shuttle is ready for launch'
-      launchStatus.style.color = 'green';
+      shuttleReady();
    }
 
    event.preventDefault();
 }
 
 function shuttleNotReady() {
-   faultyItems.style.visibility = 'visible';
    launchStatus.textContent = 'Shuttle not ready for launch';
    launchStatus.style.color = 'red';
 
@@ -64,6 +73,13 @@ function shuttleNotReady() {
    if (cargoMass.value > 10000) {
       cargoStatus.textContent = 'Cargo mass too high for launch';
    }
+}
+
+function shuttleReady() {
+   launchStatus.textContent = 'Shuttle is ready for launch'
+   launchStatus.style.color = 'green';
+   fuelStatus.textContent = 'Fuel level high enough for launch';
+   cargoStatus.textContent = 'Cargo mass low enough for launch';
 }
 
 function selectPlanet() {
