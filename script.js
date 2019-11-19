@@ -1,5 +1,7 @@
 let fieldsFilled = false;
 let fieldsFilledWithCorrectValue = false;
+let enoughFuel = false;
+let lowEnoughMass = false;
 
 window.addEventListener('load', function() {
    let form = document.getElementById('launchForm').getElementsByTagName('form')[0];
@@ -20,7 +22,7 @@ window.addEventListener('load', function() {
       checkAllFieldsFilled();
       checkFieldsFilledWithCorrectType();
       if (fieldsFilled && fieldsFilledWithCorrectValue) {
-         updateShuttleRequirements();
+         updateFlightRequirements();
          selectPlanet();
       }
    })
@@ -48,38 +50,46 @@ function checkFieldsFilledWithCorrectType() {
    }
 }
 
-function updateShuttleRequirements() {
+function updateFlightRequirements() {
    pilotStatus.textContent = `Pilot ${pilotName.value} is ready for launch`;
    copilotStatus.textContent = `Copilot ${copilotName.value} is ready for launch`;
    faultyItems.style.visibility = 'visible';
 
-   if (fuelLevel.value < 10000 || cargoMass.value > 10000) {
-      shuttleNotReady();
-   } else {
-      shuttleReady();
-   }
+   checkFuelLevel();
+   checkCargoMass();
+   updateFlightStatusAndColor();
 
    event.preventDefault();
 }
 
-function shuttleNotReady() {
-   launchStatus.textContent = 'Shuttle not ready for launch';
-   launchStatus.style.color = 'red';
-
+function checkFuelLevel() {
    if (fuelLevel.value < 10000) {
       fuelStatus.textContent = 'Fuel level too low for launch';
-   }
-
-   if (cargoMass.value > 10000) {
-      cargoStatus.textContent = 'Cargo mass too high for launch';
+      enoughFuel = false;
+   } else {
+      fuelStatus.textContent = 'Fuel level high enough for launch';
+      enoughFuel = true;
    }
 }
 
-function shuttleReady() {
-   launchStatus.textContent = 'Shuttle is ready for launch'
-   launchStatus.style.color = 'green';
-   fuelStatus.textContent = 'Fuel level high enough for launch';
-   cargoStatus.textContent = 'Cargo mass low enough for launch';
+function checkCargoMass() {
+   if (cargoMass.value > 10000) {
+      cargoStatus.textContent = 'Cargo mass too high for launch';
+      lowEnoughMass = false;
+   } else {
+      cargoStatus.textContent = 'Cargo mass low enough for launch';
+      lowEnoughMass = true;
+   }
+}
+
+function updateFlightStatusAndColor() {
+   if (enoughFuel && lowEnoughMass) {
+      launchStatus.textContent = 'Shuttle is ready for launch'
+      launchStatus.style.color = 'green';   
+   } else {
+      launchStatus.textContent = 'Shuttle not ready for launch';
+      launchStatus.style.color = 'red';
+   }
 }
 
 function selectPlanet() {
